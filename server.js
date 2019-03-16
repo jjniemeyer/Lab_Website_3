@@ -100,7 +100,7 @@ app.get('/home', function(req, res) {
 	res.render('pages/home',{
 		my_title:'Home Page',
 		color: 'FF0000',
-		color_msg: 'The Color Red - test'
+		color_msg: 'The Color Red'
 	});
 });
 
