@@ -151,6 +151,35 @@ app.get('/home/pick_color', function(req, res) {
     });
 
 });
+
+/* attempt team-stats post*/
+app.get('/team_stats', function(req, res) {
+	var query = 'select visitor_name, home_score, visitor_score, TO_CHAR(game_date::DATE, \'Mon dd, yyyy\') as game_date from football_games;';
+	var wins = 'select count(*) from football_games where home_score > visitor_score;';
+	var losses = 'select count(*) from football_games where home_score < visitor_score;';
+	db.any(query)
+        .then(function (rows) {
+            res.render('pages/team_stats',{
+				my_title: "Team Stats",
+				data: rows,
+				wins: wins,
+				losses: losses,
+
+			})
+
+        })
+        .catch(function (err) {
+            // display error message in case an error
+            request.flash('error', err);
+            response.render('pages/team_stats', {
+                title: 'Team Stats',
+                data: '',
+								wins: '',
+								losses: '',
+
+            })
+        })
+});
 /* process post request */
 app.post('/home/pick_color', function(req, res) {
 	var color_hex = req.body.color_hex;
