@@ -31,7 +31,7 @@
 				var winner;
 				if(r.home_score > r.visitor_score) {winner="CU Buffs"}else{winner=r.visitor_name}%>
 			<tr>
-				<td> <%= r.game_date %> </td>
+				<td> <%= r.formatted_game_date %> </td>
 				<td> <%= r.visitor_name %></td>
 				<td> <%= r.home_score %> </td>
 				<td> <%= r.visitor_score %> </td>
@@ -54,12 +54,11 @@
 
 				<td> <!-- TODO: Display the total number of wins here.
 							    This value should come from your server.js files query, don't calculate it in this file! -->
-									<%= wins %>
-
+								<%= num_wins[0].count%>
 							</td>
 				<td> <!-- TODO: Display the total number of losses here.
 							    This value should come from your server.js files query, don't calculate it in this file! -->
-                <%= losses %>
+              <%= num_losses[0].count%>
 								</td>
 
 			</tr>

@@ -110,8 +110,8 @@ app.get('/home', function(req, res) {
         })
         .catch(function (err) {
             // display error message in case an error
-            request.flash('error', err);
-            response.render('pages/home', {
+            req.flash('error', err);
+            res.render('pages/home', {
                 title: 'Home Page',
                 data: '',
                 color: '',
@@ -141,8 +141,8 @@ app.get('/home/pick_color', function(req, res) {
     })
     .catch(error => {
         // display error message in case an error
-            request.flash('error', err);
-            response.render('pages/home', {
+            req.flash('error', err);
+            res.render('pages/home', {
                 title: 'Home Page',
                 data: '',
                 color: '',
@@ -154,31 +154,34 @@ app.get('/home/pick_color', function(req, res) {
 
 /* attempt team-stats post*/
 app.get('/team_stats', function(req, res) {
-	var query = 'select visitor_name, home_score, visitor_score, TO_CHAR(game_date::DATE, \'Mon dd, yyyy\') as game_date from football_games;';
-	var wins = 'select count(*) from football_games where home_score > visitor_score;';
-	var losses = 'select count(*) from football_games where home_score < visitor_score;';
-	db.any(query)
-        .then(function (rows) {
-            res.render('pages/team_stats',{
-				my_title: "Team Stats",
-				data: rows,
-				wins: wins,
-				losses: losses,
-
+	var query = 'select visitor_name, home_score, visitor_score, TO_CHAR(game_date::DATE, \'Mon dd, yyyy\') as formatted_game_date from football_games;';
+	var wins_q = 'select count(*) from football_games where home_score > visitor_score;';
+	var losses_q = 'select count(*) from football_games where home_score < visitor_score;';
+	db.task('get-everything', task => {
+				return task.batch([
+						task.any(query),
+						task.any(wins_q),
+						task.any(losses_q)
+				]);
+		})
+		.then(info => {
+			res.render('pages/team_stats',{
+				my_title: "Season Stats",
+				data: info[0],
+				num_wins: info[1],
+				num_losses: info[2]
 			})
-
-        })
-        .catch(function (err) {
-            // display error message in case an error
-            request.flash('error', err);
-            response.render('pages/team_stats', {
-                title: 'Team Stats',
-                data: '',
-								wins: '',
-								losses: '',
-
-            })
-        })
+		})
+		.catch(error => {
+				// display error message in case an error
+						req.flash('error', err);
+						res.render('pages/team_stats', {
+								title: 'Team Stats',
+								data: '',
+								num_wins: '',
+								num_losses: ''
+						})
+		});
 });
 /* process post request */
 app.post('/home/pick_color', function(req, res) {
