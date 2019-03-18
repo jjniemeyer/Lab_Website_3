@@ -152,7 +152,7 @@ app.get('/home/pick_color', function(req, res) {
 
 });
 
-/* attempt team-stats post*/
+/*  team-stats get*/
 app.get('/team_stats', function(req, res) {
 	var query = 'select visitor_name, home_score, visitor_score, TO_CHAR(game_date::DATE, \'Mon dd, yyyy\') as formatted_game_date from football_games;';
 	var wins_q = 'select count(*) from football_games where home_score > visitor_score;';
@@ -182,6 +182,28 @@ app.get('/team_stats', function(req, res) {
 								num_losses: ''
 						})
 		});
+});
+
+/* player stats get 1 */
+app.get('/player_info', function(req, res) {
+	var query = 'select * from football_players;';
+	db.any(query)
+        .then(function (rows) {
+            res.render('pages/player_info',{
+				my_title: "Player Info",
+				data: rows,
+
+			})
+
+        })
+        .catch(function (err) {
+            // display error message in case an error
+            req.flash('error', err);
+            res.render('pages/player_info', {
+                title: 'Player Info',
+                data: '',
+            })
+        })
 });
 /* process post request */
 app.post('/home/pick_color', function(req, res) {
